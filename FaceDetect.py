@@ -24,10 +24,10 @@ myc = mycon.cursor()
 class Video():
     def __init__(self):
         self.FaceData = np.load("FaceData.npy")
-        self.name = self.FaceData[: , 0]
-        self.face = self.FaceData[: , 1:].astype(int)
+        self.face = self.FaceData[: , :-1].astype(int)
+        self.enrollment = self.FaceData[: , -1]
         self.model = KNeighborsClassifier()
-        self.model.fit(self.face ,self.name)
+        self.model.fit(self.face ,self.enrollment)
         
     def capture(self,Class):
         detector = get_frontal_face_detector()
@@ -40,7 +40,7 @@ class Video():
                 if len(faces) != 0:
                     face = faces[0]
                     x1 = face.left()
-                    y1 = face.top()
+                    y1 = face.top()-70
                     x2 = face.right()
                     y2 = face.bottom()
                     faceFrame = frame[y1:y2,x1:x2]
@@ -57,7 +57,7 @@ class Video():
                     self.TakeAttendance(Class , name)
                 cv.imshow("frame",frame)
                 
-            key = cv.waitKey(10)
+            key = cv.waitKey(100)
             if key == ord('q'):
                 cap.release()
                 cv.destroyAllWindows()
@@ -80,6 +80,7 @@ class Video():
 
     def TakeAttendance(self, Class,name):
         print(Class,name)
+        #sql and shit goes here
 
 # vid = Video()
 # vid.capture("ML")

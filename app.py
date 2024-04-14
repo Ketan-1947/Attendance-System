@@ -4,7 +4,7 @@ import FaceDetect
 import GatherData
 
 #creating instance of FaceDetect class
-FaceDetectInstance = FaceDetect
+FaceDetectInstance = FaceDetect.Video()
 GatherDataInstance = GatherData.Video()
 
 #setting up connection
@@ -41,7 +41,7 @@ class App():
         canvas.place(x=0 , y=0, width=500 , height=600)
 
         #creating buttons
-        CaptureButton = Button(CaptureScreen , text="Capture" , command=lambda:(FaceDetectInstance.Video.GetClass(),CaptureScreen.destroy()))
+        CaptureButton = Button(CaptureScreen , text="Capture" , command=lambda:(FaceDetectInstance.GetClass(),CaptureScreen.destroy()))
         BackButton = Button(CaptureScreen , text="<-" , command=lambda: (self.MainWindow(),CaptureScreen.destroy()))
 
         #placing buttons
