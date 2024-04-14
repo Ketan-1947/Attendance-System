@@ -45,7 +45,7 @@ class Video():
                 grayFace = np.array(grayFace).flatten()
                 FaceData.append(grayFace)
                 EnrollmentNums.append([enrollment])
-                Students[name] = enrollment
+                Students[enrollment] = name
 
         
             if key == ord('n'):
