@@ -5,19 +5,28 @@ import numpy as np
 from tkinter import *
 import mysql.connector as sql
 from sklearn.neighbors import KNeighborsClassifier
-
+import psycopg2 as psql
 
 #connecting to database
-mycon = sql.connect(host="localhost",user="root",password="zp17dmtijm",database="attendance")
-
-#checking connection
-if mycon.is_connected():
-    print("Connected to database")
-else:
-    print("Failed to connect")
+try:
+    psqlcon = psql.connect(host="localhost",user="postgres",password="zp17dmtijm",database="test")
+    print("Connected to postgres")
+except (Exception, psql.DatabaseError) as error:
+    print("Failed to connect to postgres")
 
 #creating cursor
-myc = mycon.cursor()
+psqlcur = psqlcon.cursor()
+
+
+# code to connect to mysql
+# mycon = sql.connect(host="localhost",user="root",password="zp17dmtijm",database="attendance")
+# if mycon.is_connected():
+#     print("Connected to database")
+# else:
+#     print("Failed to connect")
+
+# #creating cursor
+# myc = mycon.cursor()
 
 
 #capturing video
@@ -29,7 +38,7 @@ class Video():
         self.model = KNeighborsClassifier()
         self.model.fit(self.face ,self.enrollment)
         self.presentStudents = dict()
-        self.counter = 0
+        self.counter = 1
         
     def capture(self,Class):
         detector = get_frontal_face_detector()
@@ -60,20 +69,20 @@ class Video():
                     if enrollment != "not recognized":
                         cv.putText(frame,enrollment,(x1,y1),cv.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
                         if enrollment[0] not in self.presentStudents:
-                            self.presentStudents[self.counter] = enrollment
+                            self.presentStudents[enrollment] = self.counter
                     else:
                         cv.putText(frame,enrollment,(x1,y1),cv.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
                     
                 else:
                     cv.putText(frame,"No face detected",(50,50),cv.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
-                    
+
                 cv.imshow("frame",frame)
                 
             key = cv.waitKey(100)
             if key == ord('q'):
                 cap.release()
                 cv.destroyAllWindows()
-                self.TakeAttendance(Class , enrollment)
+                self.TakeAttendance(Class)
                 break
         
     def GetClass(self):
@@ -89,16 +98,26 @@ class Video():
         button.place(x=160 , y=300 , width=200 , height=50)
 
     def PredictFace(self,face):
-        distances, indices = self.model.kneighbors(face)
+        distances= self.model.kneighbors(face)
         if distances[0][0] > 10000:
             return "not recognized"
         return self.model.predict(face)[0]
         
 
-    def TakeAttendance(self, Class,enrollment):
+    def TakeAttendance(self, Class):
         print(self.presentStudents) 
-        
-        #sql and shit goes here
+        students = np.load("Students.npy" , allow_pickle=True).item()
+        for i in students:
+            try:
+                if self.presentStudents[i]:
+                    print("{} , {} is present in {}".format(students[i],i,Class))
+                    psqlcur.execute("insert into attendance values('{}','{}',CURRENT_DATE,'{}');".format(i,students[i],True))
+            except KeyError:
+                psqlcur.execute("insert into attendance values('{}','{}',CURRENT_DATE,'{}');".format(i,students[i],False))
+                print("absent")
+            
+        psqlcon.commit()
+            
 
-vid = Video()
-vid.capture("ML")
+# vid = Video()
+# vid.capture("ML")
