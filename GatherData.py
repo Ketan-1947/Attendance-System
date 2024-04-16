@@ -5,6 +5,9 @@ import os
 
 class Video():
     def GatherData(self):
+        self.gather = False
+        self.count = 0
+
         self.cap = cv.VideoCapture(0)
         
         self.face_detector = dlib.get_frontal_face_detector()
@@ -29,10 +32,25 @@ class Video():
                 x2 = face.right()
                 y2 = face.bottom()
                 faceFrame = self.frame[y1:y2,x1:x2]
-                faceFrame = cv.resize(faceFrame,(200,200))
-                grayFace = cv.cvtColor(faceFrame, cv.COLOR_BGR2GRAY)
-                grayFace = grayFace.flatten()
+                try:
+                    faceFrame = cv.resize(faceFrame,(200,200))
+                    grayFace = cv.cvtColor(faceFrame, cv.COLOR_BGR2GRAY)
+                    grayFace = grayFace.flatten()
+                except Exception as e:
+                    print(e)
+                    continue
             
+            if self.gather and self.count<100:
+                grayFace = np.array(grayFace).flatten()
+                FaceData.append(grayFace)
+                EnrollmentNums.append([enrollment])
+                self.count += 1
+                if self.count == 100:
+                    self.gather = False
+                    self.count = 0
+                    print("done")
+
+
             if self.ret:
                 cv.imshow('frame', self.frame)
                 cv.imshow('face', faceFrame)
@@ -42,9 +60,7 @@ class Video():
                 break
             
             if key == ord('c'):
-                grayFace = np.array(grayFace).flatten()
-                FaceData.append(grayFace)
-                EnrollmentNums.append([enrollment])
+                self.gather = True
                 Students[enrollment] = name
 
         
