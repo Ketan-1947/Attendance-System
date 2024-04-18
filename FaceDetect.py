@@ -10,7 +10,6 @@ import psycopg2 as psql
 #connecting to database
 try:
     psqlcon = psql.connect(host="localhost",user="postgres",password="zp17dmtijm",database="test")
-    print("Connected to postgres")
 except (Exception, psql.DatabaseError) as error:
     print("Failed to connect to postgres")
 
@@ -91,33 +90,41 @@ class Video():
         screen.resizable(0,0)
         screen.title("Class")
 
-        entry = Entry(screen)
-        entry.place(x=160 , y=200 , width=200 , height=50)
+        label = Label(screen , text="Enter Class")
+        label.place(x=160 , y=100 , width=200 , height=50)
+        
+        psqlcur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';")
+        classes = psqlcur.fetchall()
+        classes = [x[0] for x in classes]
 
-        button = Button(screen , text="Submit" , command=lambda: (self.capture(entry.get()),screen.destroy()))
+        #creating menu
+        
+        ClassOptions=StringVar(screen)
+        ClassOptions.set("select Class")
+        marks=OptionMenu(screen,ClassOptions,*classes)
+        marks.place(x=70,y=200,height=50,width=200)
+
+        button = Button(screen , text="Submit" , command=lambda: (self.capture(ClassOptions.get()),screen.destroy()))
         button.place(x=160 , y=300 , width=200 , height=50)
 
     def PredictFace(self,face):
-        distances= self.model.kneighbors(face)
+        distances ,items= self.model.kneighbors(face)
         if distances[0][0] > 10000:
             return "not recognized"
         return self.model.predict(face)[0]
         
 
     def TakeAttendance(self, Class):
-        print(self.presentStudents) 
         students = np.load("Students.npy" , allow_pickle=True).item()
         for i in students:
             try:
                 if self.presentStudents[i]:
-                    print("{} , {} is present in {}".format(students[i],i,Class))
-                    psqlcur.execute("insert into attendance values('{}','{}',CURRENT_DATE,'{}');".format(i,students[i],True))
+                    psqlcur.execute("insert into {} values('{}','{}',CURRENT_DATE,'{}');".format(Class,i,students[i],True))
             except KeyError:
-                psqlcur.execute("insert into attendance values('{}','{}',CURRENT_DATE,'{}');".format(i,students[i],False))
-                print("absent")
+                psqlcur.execute("insert into {} values('{}','{}',CURRENT_DATE,'{}');".format(Class,i,students[i],False))
             
         psqlcon.commit()
             
 
 # vid = Video()
-# vid.capture("ML")
+# vid.capture("ml")

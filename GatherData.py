@@ -37,7 +37,6 @@ class Video():
                     grayFace = cv.cvtColor(faceFrame, cv.COLOR_BGR2GRAY)
                     grayFace = grayFace.flatten()
                 except Exception as e:
-                    print(e)
                     continue
             
             if self.gather and self.count<100:
@@ -89,5 +88,5 @@ class Video():
         self.cap.release()
         cv.destroyAllWindows()
             
-Vid = Video()
-Vid.GatherData()
+# Vid = Video()
+# Vid.GatherData()
