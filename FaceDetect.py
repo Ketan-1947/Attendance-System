@@ -84,28 +84,6 @@ class Video():
                 self.TakeAttendance(Class)
                 break
         
-    def GetClass(self):
-        screen = Tk()
-        screen.geometry("500x500")
-        screen.resizable(0,0)
-        screen.title("Class")
-
-        label = Label(screen , text="Enter Class")
-        label.place(x=160 , y=100 , width=200 , height=50)
-        
-        psqlcur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';")
-        classes = psqlcur.fetchall()
-        classes = [x[0] for x in classes]
-
-        #creating menu
-        
-        ClassOptions=StringVar(screen)
-        ClassOptions.set("select Class")
-        marks=OptionMenu(screen,ClassOptions,*classes)
-        marks.place(x=70,y=200,height=50,width=200)
-
-        button = Button(screen , text="Submit" , command=lambda: (self.capture(ClassOptions.get()),screen.destroy()))
-        button.place(x=160 , y=300 , width=200 , height=50)
 
     def PredictFace(self,face):
         distances ,items= self.model.kneighbors(face)

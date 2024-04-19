@@ -2,9 +2,41 @@ import cv2 as cv
 import dlib
 import numpy as np
 import os
+from tkinter import *
+from PIL import Image, ImageTk
+from tkinter import messagebox
 
 class Video():
-    def GatherData(self):
+    def DataWindow(self):
+        #setting up add data screen
+        DataScreen = Tk()
+        DataScreen.geometry("500x600")
+        DataScreen.resizable(0,0)
+        DataScreen.title("Add Data")
+        
+        DataScreen.img = PhotoImage(file="images\\addstudentbg.png")
+        label_bgImage = Label(DataScreen,image=DataScreen.img)
+        label_bgImage.place(x=0, y=0)
+
+        nameLabel = Label(DataScreen , text="Name" , font=("Arial", 14 , "bold") , bg="#c9d4e5")
+        EnrollmentLabel = Label(DataScreen , text="Enrollment" , font=("Arial", 14 , "bold") , bg="#c9d4e5")
+
+        nameLabel.place(x=40 , y=294 , width=55 , height=20)
+        EnrollmentLabel.place(x=284 , y=294 , width=100 , height=20)
+
+        NameEntry = Entry(DataScreen , bg="#C9D4E5" , borderwidth=0 ,font=("Arial", 14 , "bold"))
+        EnrollmentEntry = Entry(DataScreen , bg="#C9D4E5" , borderwidth=0 , font=("Arial", 14 , "bold"))
+
+        NameEntry.place(x=40 , y=317 , width=178 , height=54) 
+        EnrollmentEntry.place(x=284 , y=317 , width=178 , height=54)
+
+        #creating buttons
+        AddButton = Button(DataScreen , text="ADD" ,font= ("Arial" , 17, "bold"), command=lambda: (self.GatherData(NameEntry.get(), EnrollmentEntry.get() ), DataScreen.destroy()) , bg = "#C9D4E5" , activebackground="#C9D4E5" , borderwidth=0)
+
+        #placing buttons
+        AddButton.place(x=202, y=440 , height=103 , width=91)
+
+    def GatherData(self , name , enrollment):
         self.gather = False
         self.count = 0
 
@@ -16,9 +48,6 @@ class Video():
         EnrollmentNums = []
 
         Students = dict()
-        
-        name=input('enter name: ')
-        enrollment=input('enter enrollment: ')
         
         while True:
             self.ret, self.frame = self.cap.read()
@@ -47,7 +76,8 @@ class Video():
                 if self.count == 100:
                     self.gather = False
                     self.count = 0
-                    print("done")
+                    messagebox.showinfo("Data Gathered", "Data Gathered Successfully")
+                    break
 
 
             if self.ret:
@@ -56,16 +86,13 @@ class Video():
             
             key = cv.waitKey(1) 
             if key == ord('q'):
+                self.DataWindow()
                 break
             
             if key == ord('c'):
                 self.gather = True
                 Students[enrollment] = name
 
-        
-            if key == ord('n'):
-                name = input('enter name: ')
-                enrollment = input('enter enrollment: ')
 
         ## adding face data to file
         
@@ -88,5 +115,6 @@ class Video():
         self.cap.release()
         cv.destroyAllWindows()
             
-# Vid = Video()
-# Vid.GatherData()
+Vid = Video()
+Vid.DataWindow()
+mainloop()
