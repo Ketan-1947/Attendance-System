@@ -16,18 +16,6 @@ except (Exception, psql.DatabaseError) as error:
 #creating cursor
 psqlcur = psqlcon.cursor()
 
-
-# code to connect to mysql
-# mycon = sql.connect(host="localhost",user="root",password="zp17dmtijm",database="attendance")
-# if mycon.is_connected():
-#     print("Connected to database")
-# else:
-#     print("Failed to connect")
-
-# #creating cursor
-# myc = mycon.cursor()
-
-
 #capturing video
 class Video():
     def __init__(self):
@@ -87,7 +75,7 @@ class Video():
 
     def PredictFace(self,face):
         distances ,items= self.model.kneighbors(face)
-        if distances[0][0] > 10000:
+        if distances[0][0] > 7000:
             return "not recognized"
         return self.model.predict(face)[0]
         
