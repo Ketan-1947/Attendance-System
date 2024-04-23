@@ -207,7 +207,12 @@ class App():
             activebackground="#c9d4e5",  # background color when clicked
         )
 
-        backButton = Button(screen , text="<-" , command=lambda: (self.destruction(screen)) , bg="#ffffff" , activebackground="#ffffff" , fg="#524646" , font=("Arial", 12 , "bold") , borderwidth=0)
+        backButton = Button(screen , text="<-" ,
+                            command=lambda: (self.destruction(screen)) ,
+                            bg="#ffffff" , activebackground="#ffffff" ,
+                            fg="#524646" , font=("Arial", 12 , "bold") ,
+                            borderwidth=0)
+        
         backButton.place(x=5 , y=5 , width=25 , height=20)
 
         SubmitButton = Button(screen , text="Submit" , command=lambda: (self.ShowAttendance(enrollment.get(),ClassOptions.get() ,screen)) , bg="#c9d4e5" , activebackground="#c9d4e5" , fg="#524646" , font=("Arial", 12 , "bold") , borderwidth=0)
@@ -223,6 +228,8 @@ class App():
             psqlcur.execute("SELECT COUNT(*) FROM {} WHERE enrollment = '{}';".format(Class,enrollment))
             total = psqlcur.fetchall()[0][0]
         except Exception as e:
+            psqlcur.execute("ROLLBACK")
+            psqlcon.commit()
             messagebox.showerror("Error","Error in Values")
             return
         percentage = round((present/total)*100,2)
@@ -238,7 +245,7 @@ class App():
         TotalClasses.place(x=200 , y=460 , width=145 , height=35)
 
     def GetTotalAttendance(self ,Class):
-        if Class == '':
+        if Class == "select Class":
             messagebox.showerror("Error","Enter Class")
             return
         Students = np.load("Students.npy" , allow_pickle=True).item()
@@ -254,7 +261,7 @@ class App():
             total = psqlcur.fetchall()[0][0]
             enrollment.append(i)
             name.append(Students[i])
-            attendance.append((present/total)*100)
+            attendance.append(round((present/total)*100,2))
         
         data = {
             "Enrollment":enrollment,
@@ -264,8 +271,6 @@ class App():
 
         data = pd.DataFrame(data)
         data.to_csv("Attendance.csv")
-        
-        
 
 #vid = FaceDetect.video.capture()
 App = App()

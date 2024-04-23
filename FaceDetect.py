@@ -3,7 +3,6 @@ from dlib import get_frontal_face_detector
 import cv2 as cv
 import numpy as np
 from tkinter import *
-import mysql.connector as sql
 from sklearn.neighbors import KNeighborsClassifier
 import psycopg2 as psql
 
@@ -75,22 +74,48 @@ class Video():
 
     def PredictFace(self,face):
         distances ,items= self.model.kneighbors(face)
-        if distances[0][0] > 7000:
+        if distances[0][0] > 9000:
             return "not recognized"
         return self.model.predict(face)[0]
         
 
-    def TakeAttendance(self, Class):
+    # def TakeAttendance(self, Class):
+    #     students = np.load("Students.npy" , allow_pickle=True).item()
+    #     for i in students:
+    #         try:
+    #             if self.presentStudents[i]:
+    #                 psqlcur.execute("select present from {} where day = CURRENT_DATE and enrollment = '{}';".format(Class,i))
+    #                 marked = psqlcur.fetchone()
+    #                 if marked == None:
+    #                     psqlcur.execute("insert into {} values('{}','{}',CURRENT_DATE,'{}');".format(Class,i,students[i],True))
+    #                 elif (marked[0] == False):
+    #                     psqlcur.execute("update {} set present = True where enrollment = '{}' and day = CURRENT_DATE;".format(Class,i))
+    #             psqlcon.commit()
+    #         except KeyError:
+    #             psqlcur.execute("insert into {} values('{}','{}',CURRENT_DATE,'{}');".format(Class,i,students[i],False))
+            
+    #     psqlcon.commit()
+
+    def TakeAttendance(self,Class):
         students = np.load("Students.npy" , allow_pickle=True).item()
         for i in students:
-            try:
-                if self.presentStudents[i]:
-                    psqlcur.execute("insert into {} values('{}','{}',CURRENT_DATE,'{}');".format(Class,i,students[i],True))
-            except KeyError:
-                psqlcur.execute("insert into {} values('{}','{}',CURRENT_DATE,'{}');".format(Class,i,students[i],False))
-            
+            psqlcur.execute("select present from {} where day = CURRENT_DATE and enrollment = '{}';".format(Class,i))
+            marked = psqlcur.fetchone()
+            if marked == None:
+                try:
+                   if self.presentStudents[i]:
+                       psqlcur.execute("insert into {} values('{}','{}',CURRENT_DATE,'{}');".format(Class,i,students[i],True))
+                except Exception as e:
+                    psqlcur.execute("insert into {} values('{}','{}',CURRENT_DATE,'{}');".format(Class,i,students[i],False))
+            elif marked[0] == False:
+                try:                                        
+                    if self.presentStudents[i]:
+                        psqlcur.execute("update {} set present = True where enrollment = '{}' and day = CURRENT_DATE;".format(Class,i)) 
+                except Exception as e:
+                    continue
+
         psqlcon.commit()
             
 
 # vid = Video()
-# vid.capture("ml")
+# vid.capture("fml")
