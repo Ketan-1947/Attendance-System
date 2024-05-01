@@ -79,23 +79,6 @@ class Video():
         return self.model.predict(face)[0]
         
 
-    # def TakeAttendance(self, Class):
-    #     students = np.load("Students.npy" , allow_pickle=True).item()
-    #     for i in students:
-    #         try:
-    #             if self.presentStudents[i]:
-    #                 psqlcur.execute("select present from {} where day = CURRENT_DATE and enrollment = '{}';".format(Class,i))
-    #                 marked = psqlcur.fetchone()
-    #                 if marked == None:
-    #                     psqlcur.execute("insert into {} values('{}','{}',CURRENT_DATE,'{}');".format(Class,i,students[i],True))
-    #                 elif (marked[0] == False):
-    #                     psqlcur.execute("update {} set present = True where enrollment = '{}' and day = CURRENT_DATE;".format(Class,i))
-    #             psqlcon.commit()
-    #         except KeyError:
-    #             psqlcur.execute("insert into {} values('{}','{}',CURRENT_DATE,'{}');".format(Class,i,students[i],False))
-            
-    #     psqlcon.commit()
-
     def TakeAttendance(self,Class):
         students = np.load("Students.npy" , allow_pickle=True).item()
         for i in students:

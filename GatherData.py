@@ -3,7 +3,6 @@ import dlib
 import numpy as np
 import os
 from tkinter import *
-from PIL import Image, ImageTk
 from tkinter import messagebox
 
 class Video():
@@ -88,4 +87,4 @@ class Video():
         cv.destroyAllWindows()
             
 # Vid = Video()
-# Vid.DataWindow()
+# Vid.GatherData("Ketan","01318011622")

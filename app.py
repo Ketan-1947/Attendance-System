@@ -225,14 +225,18 @@ class App():
         try:
             psqlcur.execute("SELECT COUNT(*) FROM {} WHERE enrollment = '{}' and present = 't';".format(Class,enrollment))
             present = psqlcur.fetchall()[0][0]
-            psqlcur.execute("SELECT COUNT(*) FROM {} WHERE enrollment = '{}';".format(Class,enrollment))
+            psqlcur.execute("SELECT COUNT(DISTINCT day) FROM {};".format(Class,enrollment))
             total = psqlcur.fetchall()[0][0]
         except Exception as e:
+            print(e)
             psqlcur.execute("ROLLBACK")
             psqlcon.commit()
             messagebox.showerror("Error","Error in Values")
             return
-        percentage = round((present/total)*100,2)
+        if total != 0:
+            percentage = round((present/total)*100,2)
+        else:
+            percentage = 0
 
         NameLabel = Label(screen , text="Name: {}".format(np.load("Students.npy" , allow_pickle=True).item()[enrollment]) , bg="#c9d4e5" , font=("Arial", 10 , "bold"))
         AttendancePercentage = Label(screen , text="Attendance: {}".format(percentage) ,bg="#c9d4e5" , font=("Arial", 10 , "bold"))
@@ -254,11 +258,11 @@ class App():
         name = []
         attendance = []
 
+        psqlcur.execute("SELECT COUNT(DISTINCT day) FROM {};".format(Class))
+        total = psqlcur.fetchall()[0][0]
         for i in Students:
             psqlcur.execute("SELECT COUNT(*) FROM {} WHERE enrollment = '{}' and present = 't';".format(Class,i))
             present = psqlcur.fetchall()[0][0]
-            psqlcur.execute("SELECT COUNT(*) FROM {} WHERE enrollment = '{}';".format(Class,i))
-            total = psqlcur.fetchall()[0][0]
             enrollment.append(i)
             name.append(Students[i])
             attendance.append(round((present/total)*100,2))
@@ -270,7 +274,7 @@ class App():
         }
 
         data = pd.DataFrame(data)
-        data.to_csv("Attendance.csv")
+        data.to_csv("{}Attendance.csv".format(Class),index=False)
 
 #vid = FaceDetect.video.capture()
 App = App()
