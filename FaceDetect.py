@@ -27,57 +27,55 @@ class Video():
         self.counter = 1
         
     def capture(self,Class):
-        detector = get_frontal_face_detector()
         cap = cv.VideoCapture(0)
         while True:
             ret,frame = cap.read()
             frame = cv.flip(frame,1)
+            
             if ret:
-                faces = detector(frame)
-                if len(faces) != 0:
-                    face = faces[0]
-                    x1 = face.left()
-                    y1 = face.top()-70
-                    x2 = face.right()
-                    y2 = face.bottom()
-                    faceFrame = frame[y1:y2,x1:x2]
-                    faceFrame = cv.resize(faceFrame,(200,200))
-                    cv.rectangle(frame,(x1,y1),(x2,y2),(0,255,255),2)
-
-                    #making face gray
-                    GrayFace = cv.cvtColor(faceFrame , cv.COLOR_BGR2GRAY)
-                    cv.imshow("face",GrayFace)
-                    GrayFace = np.array(GrayFace).flatten()
-                    
-                    #predicting face
-                    enrollment = self.PredictFace([GrayFace])
-                    
-                    if enrollment != "not recognized":
-                        cv.putText(frame,enrollment,(x1,y1),cv.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
-                        if enrollment[0] not in self.presentStudents:
-                            self.presentStudents[enrollment] = self.counter
-                    else:
-                        cv.putText(frame,enrollment,(x1,y1),cv.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
-                    
-                else:
-                    cv.putText(frame,"No face detected",(50,50),cv.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
-
                 cv.imshow("frame",frame)
-                
+
             key = cv.waitKey(100)
             if key == ord('q'):
                 cap.release()
                 cv.destroyAllWindows()
                 self.TakeAttendance(Class)
                 break
+            
+            if key == ord('c'):
+                self.PredictFaces(frame);
         
 
-    def PredictFace(self,face):
-        distances ,items= self.model.kneighbors(face)
-        if distances[0][0] > 9000:
-            return "not recognized"
-        return self.model.predict(face)[0]
+    def PredictFaces(self,frame):
+        detector = get_frontal_face_detector()
+        faces = detector(frame)
+        for face in faces:
+            x1 = face.left()
+            y1 = face.top()-70
+            x2 = face.right()
+            y2 = face.bottom()
+
+            face = frame[y1:y2 , x1:x2]
+            face = cv.resize(face , (200,200))
+            face = cv.cvtColor(face,cv.COLOR_BGR2GRAY)
+            face = face.reshape(1,-1)
+            print(face.shape)
+            enrollment = self.model.predict(face)
+            distance, index = self.model.kneighbors(face)
+            if distance[0][0] < 9000:
+                self.presentStudents[enrollment[0]] = True
+                cv.rectangle(frame,(x1,y1),(x2,y2),(0,255,0),2)
+                cv.putText(frame,enrollment[0],(x1,y1),cv.FONT_HERSHEY_SIMPLEX,1,(0,255,0),2)
         
+        while True:
+            cv.imshow("frame",frame)
+            cv.putText(frame,"Press 'c' to close",(10,30),cv.FONT_HERSHEY_SIMPLEX,1,(0,255,0),2)
+            key = cv.waitKey(100)
+
+            if key == ord('c'):
+                break
+
+
 
     def TakeAttendance(self,Class):
         students = np.load("Students.npy" , allow_pickle=True).item()
@@ -100,5 +98,5 @@ class Video():
         psqlcon.commit()
             
 
-# vid = Video()
-# vid.capture("fml")
+vid = Video()
+vid.capture("fml")

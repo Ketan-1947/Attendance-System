@@ -35,16 +35,35 @@ class App():
         self.canva.create_image(0,0,anchor=NW,image=self.img) 
 
         #creating buttons
-        self.TakeAttendanceButton = Button(self.MainScreen , text="TAKE\nATTENDANCE" ,command = lambda: (self.GetClass()) , bg = "#FFFFFF" , activebackground="#f0f0ff" , fg="#524646" , font=("Arial", 12 , "bold"))
-        self.DataButton = Button(self.MainScreen , text="ADD\nSTUDENTS", command=lambda:(self.DataWindow()) , bg = "#FFFFFF", activebackground="#ffeef8" , fg="#524646", font=("Arial", 12 , "bold"))
-        self.AddClassButton = Button(self.MainScreen , text="ADD\nCLASS", command=lambda: (self.AddClassWindow() ) , bg = "#FFFFFF", activebackground="#ffeef8" , fg="#524646", font=("Arial", 12 , "bold"))
-        self.SeeAttendanceButton = Button(self.MainScreen , text="SEE\nATTENDANCE", command=lambda: (self.SeeAttendance() ) , bg = "#FFFFFF", activebackground="#f0f0ff" , fg="#524646", font=("Arial", 12 , "bold") )
+        self.TakeAttendanceButton = Button(self.MainScreen , text="TAKE\nATTENDANCE" 
+                                           ,command = lambda: (self.GetClass()) 
+                                           , bg = "#FFFFFF"  
+                                           , font=("Arial", 12 , "bold")
+                                           , borderwidth=0)
+        
+        self.DataButton = Button(self.MainScreen , text="ADD\nSTUDENTS"
+                                 , command=lambda:(self.DataWindow()) 
+                                 , bg = "#FFFFFF"
+                                 , font=("Arial", 12 , "bold")
+                                 , borderwidth=0)
+        
+        self.AddClassButton = Button(self.MainScreen , text="ADD\nCLASS"
+                                     , command=lambda: (self.AddClassWindow() ) 
+                                     , bg = "#FFFFFF"
+                                     , font=("Arial", 12 , "bold")
+                                     , borderwidth=0)
+        
+        self.SeeAttendanceButton = Button(self.MainScreen , text="SEE\nATTENDANCE"
+                                          , command=lambda: (self.SeeAttendance() ) 
+                                          , bg = "#FFFFFF"
+                                          , font=("Arial", 12 , "bold")
+                                          , borderwidth=0)
 
         #placing buttons
-        self.TakeAttendanceButton.place(x=77, y=150 , height=136 , width=164)
-        self.DataButton.place(x=288, y=150 , height=136 , width=164)
-        self.AddClassButton.place(x=77, y=339 , height=136 , width=164)
-        self.SeeAttendanceButton.place(x=288, y=340 , height=136 , width=164)
+        self.TakeAttendanceButton.place(x=60, y=310 , height=30 , width=128)
+        self.DataButton.place(x=308, y=304 , height=35 , width=135)
+        self.AddClassButton.place(x=60, y=510 , height=30 , width=128)
+        self.SeeAttendanceButton.place(x=306, y=501 , height=36 , width=140)
     
     def destruction(self , screen):
         screen.destroy()
@@ -64,25 +83,19 @@ class App():
         screen.img= ImageTk.PhotoImage(Image.open("images\\addstudentbg.png"))
         canva.create_image(0,0,anchor=NW,image=screen.img)
 
-        nameLabel = Label(screen , text="Name" , font=("Arial", 14 , "bold") , bg="#c9d4e5")
-        EnrollmentLabel = Label(screen , text="Enrollment" , font=("Arial", 14 , "bold") , bg="#c9d4e5")
+        NameEntry = Entry(screen , bg="#CBCBCB" , borderwidth=1 ,font=("Arial", 14 , "bold") , border=0)
+        EnrollmentEntry = Entry(screen , bg="#CBCBCB" , borderwidth=1 , font=("Arial", 14 , "bold") , border=0)
 
-        nameLabel.place(x=40 , y=294 , width=55 , height=20)
-        EnrollmentLabel.place(x=284 , y=294 , width=100 , height=20)
-
-        NameEntry = Entry(screen , bg="#C9D4E5" , borderwidth=1 ,font=("Arial", 14 , "bold") , border=0)
-        EnrollmentEntry = Entry(screen , bg="#C9D4E5" , borderwidth=1 , font=("Arial", 14 , "bold") , border=0)
-
-        NameEntry.place(x=40 , y=317 , width=178 , height=54) 
-        EnrollmentEntry.place(x=284 , y=317 , width=178 , height=54)
+        NameEntry.place(x=311 , y=363 , width=150 , height=60) 
+        EnrollmentEntry.place(x=60 , y=370 , width=160 , height=57)
 
         #creating buttons
         backButton = Button(screen , text="<-" , command=lambda: (self.destruction(screen)) , bg="#ffffff" , activebackground="#ffffff" , fg="#524646" , font=("Arial", 12 , "bold") , borderwidth=0)
-        AddButton = Button(screen , text="ADD" ,font= ("Arial" , 17, "bold"),command=lambda: (GatherDataInstance.GatherData(NameEntry.get(), EnrollmentEntry.get() ), screen.destroy()) , bg = "#C9D4E5" , activebackground="#C9D4E5" , borderwidth=0)
+        AddButton = Button(screen , text="ADD" ,font= ("Arial" , 17, "bold"),command=lambda: (GatherDataInstance.GatherData(NameEntry.get(), EnrollmentEntry.get() ), screen.destroy()) , fg = 'white', bg = "#76BB7C" , activebackground="#C9D4E5" , borderwidth=0)
 
         #placing buttons
         backButton.place(x=5 , y=5 , width=25 , height=20)
-        AddButton.place(x=202, y=440 , height=103 , width=91) 
+        AddButton.place(x=166, y=497 , height=47 , width=205) 
 
     def GetClass(self):
         self.MainScreen.destroy()
@@ -98,27 +111,28 @@ class App():
 
         psqlcur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';")
         classes = psqlcur.fetchall()
-        classes = [x[0] for x in classes]
+        classes = [x[0] for x in classes if x[0] != "student_data"]
+
 
         #creating menu
         
         ClassOptions=StringVar(screen )
         ClassOptions.set("SELECT CLASS")
         Class=OptionMenu(screen,ClassOptions,*classes)
-        Class.place(x=104,y=253,height=97,width=326)
+        Class.place(x=315,y=330,height=70,width=170)
 
         Class.config(
-            bg="#ffffff",  # background color
-            fg="black",  # text color
-            font=("Arial", 14 , "bold"),  # font and font size
+            bg="#CBCBCB",  # background color
+            fg="white",  # text color
+            font=("Arial", 11 , "bold"),  # font and font size
             bd = -1,
-            activebackground="#ffffff",  # background color when clicked
-            highlightbackground="#ffffff",  # background color when focused
+            activebackground="#CBCBCB",  # background color when clicked
+            highlightbackground="#CBCBCB",  # background color when focused
         )
 
 
-        button = Button(screen , text="Submit" , command=lambda: (FaceDetectInstance.capture(ClassOptions.get())) , bg="#dff5f6" , activebackground="#dff5f6" , fg="#524646" , font=("Arial", 12 , "bold") , borderwidth=0)
-        button.place(x=197 , y=418 , width=118 , height=120)
+        button = Button(screen , text="Submit" , command=lambda: (FaceDetectInstance.capture(ClassOptions.get())) , bg="#41545B" , activebackground="#dff5f6" , fg="white" , font=("Arial", 12 , "bold") , borderwidth=0)
+        button.place(x=194 , y=470 , width=145 , height=88)
 
         backButton = Button(screen , text="<-" , command=lambda: (self.destruction(screen)) , bg="#ffffff" , activebackground="#ffffff" , fg="#524646" , font=("Arial", 12 , "bold") , borderwidth=0)
         backButton.place(x=5 , y=5 , width=25 , height=20)
@@ -137,7 +151,7 @@ class App():
         canva.create_image(0,0,anchor=NW,image=ClassScreen.img)
 
         #creating entry
-        entry = Entry(ClassScreen , borderwidth=0 , font=("Arial", 14 , "bold") , bg="#c9d4e5" , border=0)
+        entry = Entry(ClassScreen , borderwidth=0 , font=("Arial", 14 , "bold") , bg="#41545B" , border=0)
 
         #adding buttons
         def query():
@@ -151,11 +165,11 @@ class App():
                 messagebox.showerror("Error","Error in Values")
                 return
         backButton = Button(ClassScreen , text="<-" , command=lambda: (self.destruction(ClassScreen)) , bg="#ffffff" , activebackground="#ffffff" , fg="#524646" , font=("Arial", 12 , "bold") , borderwidth=0)
-        AddButoon = Button(ClassScreen , text="ADD" , command = lambda:(query()) , borderwidth=0 , bg="#c9d4e5" , activebackground="#c9d4e5" , fg="#524646" , font=("Arial", 12 , "bold") )
+        AddButoon = Button(ClassScreen , text="ADD" , command = lambda:(query()) , borderwidth=0 , bg="#BF977B" , activebackground="#c9d4e5" , fg="white" , font=("Arial", 12 , "bold") )
         #placing buttons
 
-        AddButoon.place(x=201, y=440 , height=100 , width=98)
-        entry.place(x=153 , y = 258 , height = 96 , width = 200)
+        AddButoon.place(x=185, y=490 , height=65 , width=130)
+        entry.place(x=135 , y = 345 , height = 60 , width = 230)
         backButton.place(x=5 , y=5 , width=25 , height=20)
         ## This function will have multiple lables
 
@@ -163,7 +177,7 @@ class App():
         self.MainScreen.destroy()
 
         screen = Tk()
-        screen.geometry("800x600")
+        screen.geometry("500x600")
         screen.resizable(0,0)
         screen.title("Attendance")
 
@@ -172,8 +186,8 @@ class App():
         screen.img= ImageTk.PhotoImage(Image.open("images\\seeattendancebg.png"))
         canva.create_image(0,0,anchor=NW,image=screen.img)
 
-        enrollment = Entry(screen , bg = "#c9d4e5" , borderwidth=1 , font=("Arial", 14 , "bold"))
-        enrollment.place(x=45 , y=270 , width=200 , height=50)
+        enrollment = Entry(screen , bg = "white" , borderwidth=1 , font=("Arial", 14 , "bold") ,border=0)
+        enrollment.place(x=153 , y=193 , width=210 , height=53)
 
         psqlcur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';")
         classes = psqlcur.fetchall()
@@ -184,23 +198,10 @@ class App():
         ClassOptions=StringVar(screen)
         ClassOptions.set("select Class")
         menu=OptionMenu(screen,ClassOptions,*classes)
-        menu.place(x=45,y=340,height=50,width=200)
+        menu.place(x=140,y=280,height=60,width=225)
 
         menu.config(
-            bg="#c9d4e5",  # background color
-            fg="black",  # text color
-            font=("Arial", 14 , "bold"),  # font and font size
-            borderwidth=1,
-            activebackground="#c9d4e5",  # background color when clicked
-        )
-
-        ClassOptions2=StringVar(screen)
-        ClassOptions2.set("select Class")
-        menu2=OptionMenu(screen,ClassOptions2,*classes)
-        menu2.place(x=450,y=225,height=50,width=310)
-
-        menu2.config(
-            bg="#c9d4e5",  # background color
+            bg="#F7D797",  # background color
             fg="black",  # text color
             font=("Arial", 14 , "bold"),  # font and font size
             borderwidth=1,
@@ -215,11 +216,11 @@ class App():
         
         backButton.place(x=5 , y=5 , width=25 , height=20)
 
-        SubmitButton = Button(screen , text="Submit" , command=lambda: (self.ShowAttendance(enrollment.get(),ClassOptions.get() ,screen)) , bg="#c9d4e5" , activebackground="#c9d4e5" , fg="#524646" , font=("Arial", 12 , "bold") , borderwidth=0)
-        SubmitButton.place(x=90 , y=490 , width=200 , height=50)
+        SubmitButton = Button(screen , text="Submit" , command=lambda: (self.ShowAttendance(enrollment.get(),ClassOptions.get() ,screen)) , bg="#BF977B" , activebackground="#c9d4e5" , fg='white' , font=("Arial", 12 , "bold") , borderwidth=0)
+        SubmitButton.place(x=94 , y=510 , width=120 , height=78)
 
-        GetTotalAttendance = Button(screen , text = "GENERATE TOTAL" , command = lambda: self.GetTotalAttendance(ClassOptions2.get()), bg="#c9d4e5" , activebackground="#c9d4e5" , fg="#524646" , font=("Arial", 12 , "bold") , borderwidth=0)
-        GetTotalAttendance.place(x=450 , y=290, width=310 , height=250)
+        GetTotalAttendance = Button(screen , text = "GENERATE\nCSV" , command = lambda: self.GetTotalAttendance(ClassOptions.get()), bg="#BF977B" , activebackground="#c9d4e5" , fg='white' , font=("Arial", 9 , "bold") , borderwidth=0)
+        GetTotalAttendance.place(x=316 , y=510, width=120 , height=78)
 
     def ShowAttendance(self,enrollment,Class ,screen):
         try:
@@ -238,15 +239,15 @@ class App():
         else:
             percentage = 0
 
-        NameLabel = Label(screen , text="Name: {}".format(np.load("Students.npy" , allow_pickle=True).item()[enrollment]) , bg="#c9d4e5" , font=("Arial", 10 , "bold"))
-        AttendancePercentage = Label(screen , text="Attendance: {}".format(percentage) ,bg="#c9d4e5" , font=("Arial", 10 , "bold"))
-        ClassesAttended = Label(screen , text="Classes Attended: {}".format(present) , bg="#c9d4e5" , font=("Arial", 10 , "bold"))
-        TotalClasses = Label(screen , text="Total Classes: {}".format(total) , bg="#c9d4e5" , font=("Arial", 10 , "bold"))
+        NameLabel = Label(screen , text="Name: {}".format(np.load("Students.npy" , allow_pickle=True).item()[enrollment]) , bg="#F7D797" , font=("Arial", 14 , "bold") , fg='white')
+        AttendancePercentage = Label(screen , text="Attendance: {}".format(percentage) ,bg="#F7D797" , font=("Arial", 14 , "bold"), fg='white')
+        ClassesAttended = Label(screen , text="Classes Attended: {}".format(present) , bg="#F7D797" , font=("Arial", 12 , "bold"), fg='white')
+        TotalClasses = Label(screen , text="Total Classes: {}".format(total) , bg="#F7D797" , font=("Arial", 12 , "bold"), fg='white')
 
-        NameLabel.place(x=45 , y=410 , width=145 , height=35)
-        AttendancePercentage.place(x=200 , y=410 , width=145 , height=35)
-        ClassesAttended.place(x=45 , y=460 , width=145 , height=35)
-        TotalClasses.place(x=200 , y=460 , width=145 , height=35)
+        NameLabel.place(x=100 , y=350 , width=170 , height=35)
+        AttendancePercentage.place(x=300 , y=350 , width=170 , height=35)
+        ClassesAttended.place(x=100 , y=410 , width=170 , height=35)
+        TotalClasses.place(x=300 , y=410 , width=170 , height=35)
 
     def GetTotalAttendance(self ,Class):
         if Class == "select Class":
